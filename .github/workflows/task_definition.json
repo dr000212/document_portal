@@ -8,7 +8,7 @@
   "containerDefinitions": [
     {
       "name": "document-portal-container",
-      "image": "471112538944.dkr.ecr.us-east-1.amazonaws.com/documentportal",
+      "image": "471112538944.dkr.ecr.eu-west-2.amazonaws.com/documentportal",
       "cpu": 1024,
       "essential": true,
       "portMappings": [
@@ -29,7 +29,7 @@
       "secrets": [
         {
           "name": "API_KEYS",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:471112538944:secret:api_keys-iPSTUY"
+          "valueFrom": "arn:aws:secretsmanager:eu-west-2:471112538944:secret:API_KEYS-T10Fmn"
         }
         
       ],
