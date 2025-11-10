@@ -1,7 +1,7 @@
 {
   "family": "documentportaltd",
   "networkMode": "awsvpc",
-  "executionRoleArn": "arn:aws:iam::471112538944:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::471112538944:role/ecs",
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "1024",
   "memory": "8192",
