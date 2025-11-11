@@ -3,14 +3,15 @@ import sys
 import json
 from dotenv import load_dotenv
 from utils.config_loader import load_config
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
+from langchain_openai import OpenAIEmbeddings
 from langchain_groq import ChatGroq
 from logger import GLOBAL_LOGGER as log
 from exception.custom_exception import DocumentPortalException
 
 
 class ApiKeyManager:
-    REQUIRED_KEYS = ["GROQ_API_KEY", "GOOGLE_API_KEY"]
+    REQUIRED_KEYS = ["GROQ_API_KEY", "OPENAI_API_KEY"]
 
     def __init__(self):
         self.api_keys = {}
@@ -73,8 +74,8 @@ class ModelLoader:
         try:
             model_name = self.config["embedding_model"]["model_name"]
             log.info("Loading embedding model", model=model_name)
-            return GoogleGenerativeAIEmbeddings(model=model_name,
-                                                google_api_key=self.api_key_mgr.get("GOOGLE_API_KEY")) #type: ignore
+            return  OpenAIEmbeddings(model=model_name,
+                                                openai_api_key=self.api_key_mgr.get("OPENAI_API_KEY")) #type: ignore
         except Exception as e:
             log.error("Error loading embedding model", error=str(e))
             raise DocumentPortalException("Failed to load embedding model", sys)
@@ -84,7 +85,7 @@ class ModelLoader:
         Load and return the configured LLM model.
         """
         llm_block = self.config["llm"]
-        provider_key = os.getenv("LLM_PROVIDER", "google")
+        provider_key = os.getenv("LLM_PROVIDER", "groq")
 
         if provider_key not in llm_block:
             log.error("LLM provider not found in config", provider=provider_key)
@@ -98,28 +99,20 @@ class ModelLoader:
 
         log.info("Loading LLM", provider=provider, model=model_name)
 
-        if provider == "google":
-            return ChatGoogleGenerativeAI(
-                model=model_name,
-                google_api_key=self.api_key_mgr.get("GOOGLE_API_KEY"),
-                temperature=temperature,
-                max_output_tokens=max_tokens
-            )
-
-        elif provider == "groq":
+        if provider == "groq":
             return ChatGroq(
                 model=model_name,
                 api_key=self.api_key_mgr.get("GROQ_API_KEY"), #type: ignore
                 temperature=temperature,
             )
 
-        # elif provider == "openai":
-        #     return ChatOpenAI(
-        #         model=model_name,
-        #         api_key=self.api_key_mgr.get("OPENAI_API_KEY"),
-        #         temperature=temperature,
-        #         max_tokens=max_tokens
-        #     )
+        elif provider == "openai":
+            return ChatOpenAI(
+                model=model_name,
+                api_key=self.api_key_mgr.get("OPENAI_API_KEY"),
+                temperature=temperature,
+                max_tokens=max_tokens
+            )
 
         else:
             log.error("Unsupported LLM provider", provider=provider)
